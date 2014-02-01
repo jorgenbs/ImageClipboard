@@ -1,0 +1,23 @@
+{
+  "name": "image-clipboard",
+  "version": "0.0.0",
+  "authors": [
+    "jorgenbs <jorgenbs@gmail.com>"
+  ],
+  "description": "insert images from clipboard",
+  "main": "ClipBoard.js",
+  "keywords": [
+    "clipboard",
+    "image",
+    "copy",
+    "paste"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
