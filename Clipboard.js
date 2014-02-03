@@ -1,4 +1,5 @@
 window.Clipboard = function (selector, callback) {
+  //http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/
 
   var el = document.getElementById(selector, callback);
   
@@ -60,7 +61,7 @@ window.Clipboard = function (selector, callback) {
       return pasteBox;
   };
 
-  var getImage() = function(){};
+  var getImage = function(){};
 
   return {
     el: el,
