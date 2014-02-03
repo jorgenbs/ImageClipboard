@@ -1,6 +1,6 @@
-window.Clipboard = function (selector) {
+window.Clipboard = function (selector, callback) {
 
-  var el = document.getElementById(selector);
+  var el = document.getElementById(selector, callback);
   
   if (!window.Clipboard) {
     //firefox
@@ -17,14 +17,22 @@ window.Clipboard = function (selector) {
   else {
     //chrome
     window.addEventListener('paste', function (e) {
-      var data = e.clipboardData;
-      var reader = new FileReader();
-
-      reader.onload = function(evt) {
-
-      }
       
-      reader.readAsDataURL(file);
+      var data = e.clipboardData
+        , items = data.items
+        , reader = new FileReader()
+      
+      var blob = items[0].getAsFile();
+      
+      reader.onload = function(evt) {
+        var img = document.createElement("img");
+        img.setAttribute("src", evt.target.result);
+        el.appendChild(img);
+
+        callback(evt.target.result);
+      };
+      
+      reader.readAsDataURL(blob);
     });
   }
 
@@ -45,8 +53,17 @@ window.Clipboard = function (selector) {
           }
           img2.src = img;
           pasteBox.innerHTML = '';  
+
+          callback(img);
       });
 
       return pasteBox;
+  };
+
+  var getImage() = function(){};
+
+  return {
+    el: el,
+    getImage: getImage
   };
 }
