@@ -1,67 +1,82 @@
 window.Clipboard = function (selector, callback) {
   //http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/
 
-  var el = document.getElementById(selector, callback);
+  var el = document.getElementById(selector, callback)
+    , pasteCatcher
+    , image;
   
-  if (!window.Clipboard) {
-    //firefox
-    var pasteBox = _makeFFPasteBox();
+  //pasting now supported, make pastecatcher
+  //if (!window.Clipboard) {
+    pasteCatcher = _makePasteCatcher();
+  //}
 
-    document.body.appendChild(pasteBox);
+  window.addEventListener('paste', pasteHandler);
 
-    document.onkeydown = function (e) {
-      if (e.keyCode === 17) {
-        pasteBox.focus();
-      };
+  function pasteHandler (e) {
+    var items;
+    
+    if (e.clipboardData && e.clipboardData.items) {
+      items = e.clipboardData.items;
+      
+      if (items) {
+        items = Array.prototype.filter.call(items, function (element) {
+          return element.type.indexOf("image") >= 0;
+        });
+
+        Array.prototype.forEach.call(items, function (item) {
+          var blob = item.getAsFile();
+          var urlObj = window.URL || window.webkitURL;
+          var source = urlObj.createObjectURL(blob);
+
+          loadImage(source);
+        });
+      }
+    }
+    else if (pasteCatcher) {
+      
+      setTimeout(function () {
+      
+        var child = pasteCatcher.firstElementChild;
+
+        if (child && child.tagName == "IMG") {
+          loadImage(child.src);
+        }
+
+      }, 1000);
+    }
+  };
+
+  var loadImage = function (src) {
+    var img = new Image();
+    el.innerHTML = "";
+
+    img.onload = function () {
+      var imgContainer = document.createElement("img");
+      imgContainer.src = img.src;
+      el.appendChild(imgContainer);
     };
-  }
-  else {
-    //chrome
-    window.addEventListener('paste', function (e) {
-      
-      var data = e.clipboardData
-        , items = data.items
-        , reader = new FileReader()
-      
-      var blob = items[0].getAsFile();
-      
-      reader.onload = function(evt) {
-        var img = document.createElement("img");
-        img.setAttribute("src", evt.target.result);
-        el.appendChild(img);
 
-        callback(evt.target.result);
-      };
-      
-      reader.readAsDataURL(blob);
-    });
-  }
+    img.src = src;
+  };
 
-  var _makeFFPasteBox = function() {
-    var canvas = document.getElementById("cc")
-        , ctx = canvas.getContext("2d")
-        , pasteBox = el;
+  function _makePasteCatcher() {
+    var pasteBox = document.createElement("div");
 
-      pasteBox.setAttribute("id", "paste_ff");
+      pasteBox.setAttribute("id", "paste_catcher");
       pasteBox.setAttribute("contenteditable", "");
+      pasteBox.style.opacity = 0;
       
-      pasteBox.addEventListener("DOMSubtreeModified", function () {
-          var img = pasteBox.firstElementChild.src;
-              
-          var img2 = new Image();
-          img2.onload = function(){
-            ctx.drawImage(img2, 0, 0);
-          }
-          img2.src = img;
-          pasteBox.innerHTML = '';  
+      document.body.appendChild(pasteBox);
 
-          callback(img);
-      });
+      pasteBox.focus();
+      document.addEventListener("click", function() { pasteBox.focus(); });
 
       return pasteBox;
   };
 
-  var getImage = function(){};
+  var getImage = function(){
+    return image;
+  };
 
   return {
     el: el,
