@@ -1,6 +1,6 @@
 {
   "name": "image-clipboard",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "authors": [
     "jorgenbs <jorgenbs@gmail.com>"
   ],
@@ -12,6 +12,7 @@
     "copy",
     "paste"
   ],
+  "homepage": "https://github.com/jorgenbs/ImageClipboard",
   "license": "MIT",
   "ignore": [
     "**/.*",
