@@ -1,7 +1,10 @@
-window.ImageClipboard = function (selector, callback) {
-  //based on 
-  //http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/
+/*jshint boss:true, laxcomma: true*/
 
+window.ImageClipboard = function (selector, callback) {
+  /*
+    based on
+    http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/  
+  */
   var el = document.querySelector(selector)
     , pasteCatcher
     , clipImage
@@ -47,7 +50,7 @@ window.ImageClipboard = function (selector, callback) {
 
       }, 5); 
     }
-  };
+  }
 
   var loadImage = function (src) {
     var img = new Image();
@@ -78,7 +81,9 @@ window.ImageClipboard = function (selector, callback) {
   var destroy = function() {
     var child;
     
-    while (child = el.lastChild) el.removeChild(child);
+    while (child = el.lastChild) {
+      el.removeChild(child);
+    }
     
     if (pasteCatcher) {
       while (child = pasteCatcher.lastChild)
@@ -102,11 +107,11 @@ window.ImageClipboard = function (selector, callback) {
     document.addEventListener("click", function() { pasteBox.focus(); });
 
     return pasteBox;
-  };
+  }
 
   return {
     el: el,
     getImage: getImage,
     destroy: destroy
   };
-}
+};
