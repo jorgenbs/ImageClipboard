@@ -4,7 +4,8 @@
     if (typeof module != 'undefined') module.exports = definition
     else if (typeof define == 'function' && define.amd) define(name, definition)
     else this[name] = definition
-}('ImageClipboard', function (selector) {
+}('ImageClipboard', function (selector, callback) {
+  'use strict';
   /*
     based on
     http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/  
@@ -17,12 +18,12 @@
   self.callback = null;
   self.onpaste = null;
   
-  self.init = function(selector) {
+  self.init = function(selector, callback) {
     self.el = document.querySelector(selector)
     self.pasteCatcher = null
     self.clipImage = null;
 
-    //self.callback = callback || function(){};
+    self.callback = typeof callback === 'function' ? callback : function(){};
 
     //pasting not supported, make pastecatcher
     if (!window.Clipboard) {
@@ -44,10 +45,12 @@
 
           Array.prototype.forEach.call(items, function (item) {
             var blob = item.getAsFile();
-            var urlObj = window.URL || window.webkitURL;
-            var source = urlObj.createObjectURL(blob);
 
-            _loadImage(source);
+            var rdr = new FileReader();
+            rdr.onloadend = function () {
+              _loadImage(rdr.result);
+            }
+            rdr.readAsDataURL(blob);
           });
         }
       }
@@ -103,23 +106,13 @@
       };
 
       img.src = source;
+
+      var ret = source.split(",");
+      callback(ret[1], ret[2]); //callback(base64, file-type)
     }
 
     return self;
   }
 
-  self.getBase64 = function(img) {
-    if (img !== null) {
-      if (img.src.indexOf("blob:") === -1) return img.src;
-
-      //convert blob to base64
-      var fr = new FileReader();
-      fr.onloadend = function (event) {
-        return event.target.result;
-      }
-      fr.readAsDataURL(img.src);
-    }
-  }
-
-  return self.init(selector);
+  return self.init(selector, callback);
 });
