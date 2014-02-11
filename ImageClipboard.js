@@ -10,16 +10,28 @@
     http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/  
   */
 
-  var instance;
+  var self = {};
+  self.el = null;
+  self.pasteCatcher = null;
+  self.clipImage = null;
+  self.callback = null;
+  self.onpaste = null;
+  
+  self.init = function(selector) {
+    self.el = document.querySelector(selector)
+    self.pasteCatcher = null
+    self.clipImage = null;
 
-  function init(selector, callback) {
-    this.prototype.el = document.querySelector(selector)
-    this.prototype.pasteCatcher = null
-    this.prototype.clipImage = null;
+    //self.callback = callback || function(){};
 
-    var callback = callback || null;
+    //pasting not supported, make pastecatcher
+    if (!window.Clipboard) {
+      pasteCatcher = _makePasteCatcher();
+    }
 
-    function pasteHandler (e) {
+    window.addEventListener('paste', _pasteHandler);
+
+    function _pasteHandler(e) {
       var items;
 
       if (e.clipboardData && e.clipboardData.items) {
@@ -35,28 +47,43 @@
             var urlObj = window.URL || window.webkitURL;
             var source = urlObj.createObjectURL(blob);
 
-            loadImage(source);
+            _loadImage(source);
           });
         }
       }
-      else if (pasteCatcher) {
+      else if (self.pasteCatcher) {
         //no direct access to clipboardData (firefox)
         //use the pastecatcher
         setTimeout(function () {
         
-          var child = pasteCatcher.firstElementChild;
+          var child = self.pasteCatcher.firstElementChild;
 
           if (child && child.tagName == "IMG") {
-            loadImage(child.src);
+            _loadImage(child.src);
           }
 
         }, 5); 
       }
     }
 
-    function loadImage (source) {
+    function _makePasteCatcher() {
+      var pasteBox = document.createElement("div");
+
+      pasteBox.setAttribute("id", "paste_catcher");
+      pasteBox.setAttribute("contenteditable", "");
+      pasteBox.style.opacity = 0;
+      
+      document.body.appendChild(pasteBox);
+
+      pasteBox.focus();
+      document.addEventListener("click", function() { pasteBox.focus(); });
+
+      return pasteBox;
+    }
+
+    function _loadImage(source) {
       var img = new Image();
-      this.prototype.el.innerHTML = "";
+      self.el.innerHTML = "";
 
       img.onload = function () {
         //got picture, display it
@@ -64,34 +91,35 @@
         imgContainer.src = img.src;
         imgContainer.style.maxHeight = "100%";
         imgContainer.style.maxHeight = "100%";
-        this.prototype.el.appendChild(imgContainer);
+        self.el.appendChild(imgContainer);
 
         //empty out the ol' pastecatcher
-        if (pasteCatcher) pasteCatcher.innerHTML = "";
+        if (self.pasteCatcher) self.pasteCatcher.innerHTML = "";
 
-        this.prototype.clipImage = img; 
+        self.clipImage = img; 
+
+        if (typeof self.onpaste === 'function') 
+          self.onpaste(img);
       };
 
-      img.src = src;
+      img.src = source;
     }
 
-    function getBase64 (img) {
-      if (img !== null) {
-        if (img.src.indexOf("blob://") !== -1) return img.src;
+    return self;
+  }
 
-        //convert blob to base64
-        var fr = new FileReader();
-        fr.onload = function (event) {
-          return event.target.result;
-        }
-        fr.readAsDataURL(img.src);
+  self.getBase64 = function(img) {
+    if (img !== null) {
+      if (img.src.indexOf("blob:") === -1) return img.src;
+
+      //convert blob to base64
+      var fr = new FileReader();
+      fr.onloadend = function (event) {
+        return event.target.result;
       }
+      fr.readAsDataURL(img.src);
     }
+  }
 
-    return {
-      getBase64: getBase64,
-    }
-  }  
-
-  return instance || (instance = init(selector));
+  return self.init(selector);
 });
