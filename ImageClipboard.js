@@ -23,7 +23,7 @@
 
     //pasting not supported, make workaround
     if (!window.Clipboard) {
-      pasteCatcher = _makePasteCatcher();
+      self.pasteCatcher = _makePasteCatcher();
     }
 
     window.addEventListener('paste', _pasteHandler);
