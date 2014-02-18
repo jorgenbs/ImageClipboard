@@ -6,13 +6,18 @@
 <script type="text/javascript" src="ImageClipBoard.min.js"></script>
 <script type="text/javascript">
 
-  var clipboard = new ImageClipboard('#box');
+  var clipboard = new ImageClipboard('#box', function (base64) {
+    //do stuff with pasted image
+  });
   
   //onpaste-callback can also be passed as second argument
   //in the constructor above.
   clipboard.onpaste = function (base64) {
     //do stuff with the pasted image
   });
+
+  //you can also pass in single DOM-element instead of 
+  //query as the first parameter.
 
 </script>
 ```

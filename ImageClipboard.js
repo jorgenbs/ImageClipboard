@@ -15,7 +15,12 @@
   
   self.init = function(selector, callback) {
     
-    self.el = document.querySelector(selector);
+    if (typeof selector === "string") {
+      self.el = document.querySelector(selector);  
+    }
+    else if (_isElement(selector)) self.el = selector;
+    else return false;
+    
     self.pasteCatcher = null;
     self.clipImage = null;
 
@@ -26,12 +31,12 @@
       self.pasteCatcher = _makePasteCatcher();
     }
 
-    window.addEventListener('paste', _pasteHandler);
+    window.addEventListener('paste', self.pasteHandler);
 
     return self;
   };
 
-  function _pasteHandler(e) {
+  self.pasteHandler = function(e) {
     var items;
 
     if (e.clipboardData && e.clipboardData.items) {
@@ -67,7 +72,7 @@
 
       }, 5); 
     }
-  }
+  };
 
   function _makePasteCatcher() {
     var pasteBox = document.createElement("div");
@@ -102,12 +107,17 @@
       self.clipImage = img; 
 
       if (typeof self.onpaste === 'function') 
-        self.onpaste(img);
+        self.onpaste(img.src);
     };
 
     img.src = source;
 
     self.onpaste.call(self, source.split(",")[1]); //callback(base64, file-type)
+  }
+
+  function _isElement(obj) {
+    return typeof HTMLElement === "object" ? obj instanceof HTMLElement :
+      obj && typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName === "string";
   }
 
   return self.init(selector, callback);
