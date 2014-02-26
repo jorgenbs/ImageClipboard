@@ -23,7 +23,7 @@ gulp.task('compress', function() {
   gulp.src('ImageClipboard.js')
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
-    .pipe(uglify({outSourceMaps: false}))
+    .pipe(uglify({outSourceMaps: false, preserveComments: 'some'}))
     .pipe(rename('ImageClipboard.min.js'))
     .pipe(gulp.dest(''))
 });

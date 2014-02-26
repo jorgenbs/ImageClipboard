@@ -5,6 +5,8 @@
     <script type="text/javascript" src="../ImageClipboard.js"></script>
     <script type="text/javascript">
       var ic = new ImageClipboard('#box');
+      if (ic) console.log('hm');
+      else console.log('yay');
       ic.onpaste = function (base64) {
         console.log(base64);
       };
