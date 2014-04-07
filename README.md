@@ -1,3 +1,8 @@
+###Install
+```
+bower install image-clipboard
+```
+
 ###Paste images from clipboard to your site.
 
 
