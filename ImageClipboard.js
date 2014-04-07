@@ -1,4 +1,4 @@
-/*jshint boss:true, laxcomma: true*/
+/*jshint boss:true, laxcomma: true, expr: true*/
 !function (name, definition) {
     if (typeof module != 'undefined') module.exports = definition;
     else if (typeof define == 'function' && define.amd) define(name, definition);
